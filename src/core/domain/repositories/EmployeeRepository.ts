@@ -1,4 +1,4 @@
-import { Employee } from '../../core/domain/entities/Employee';
+import { Employee } from '../entities/Employee';
 
 export interface EmployeeRepository {
     findAll(): Promise<Employee[]>;

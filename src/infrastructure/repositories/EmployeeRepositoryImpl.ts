@@ -1,5 +1,5 @@
 import { Employee } from '../../core/domain/entities/Employee';
-import { EmployeeRepository } from './EmployeeRepository';
+import { EmployeeRepository } from '../../core/domain/repositories/EmployeeRepository';
 import { Database } from '../db/database';
 
 export class EmployeeRepositoryImpl
