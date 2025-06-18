@@ -2,7 +2,7 @@ import {
     User,
     UserRole,
 } from '../../core/domain/entities/User';
-import { UserRepository } from './UserRepository';
+import { UserRepository } from '../../core/domain/repositories/UserRepository';
 import { Database } from '../db/database';
 import bcrypt from 'bcrypt';
 
