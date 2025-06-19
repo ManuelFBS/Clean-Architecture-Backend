@@ -42,4 +42,15 @@ export class EmployeeUseCases {
 
         return this.employeeRepository.create(employee);
     }
+
+    async updateEmployee(
+        id: number,
+        employee: Partial<Employee>,
+    ): Promise<Employee> {
+        return this.employeeRepository.update(id, employee);
+    }
+
+    async deleteEmployee(id: number): Promise<void> {
+        return this.employeeRepository.delete(id);
+    }
 }
