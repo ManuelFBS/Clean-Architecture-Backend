@@ -1,4 +1,3 @@
-import { promises } from 'dns';
 import { Employee } from '../../domain/entities/Employee';
 import { EmployeeRepository } from '../../domain/repositories/EmployeeRepository';
 
