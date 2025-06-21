@@ -6,7 +6,7 @@ import {
     LoginDTO,
 } from '../dtos/UserDTO';
 
-export class UseController {
+export class UserController {
     constructor(private userUseCases: UserUseCases) {}
 
     async login(
