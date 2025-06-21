@@ -1,3 +1,4 @@
+import 'reflect-metadata';
 import express from 'express';
 import cors from 'cors';
 import employeeRoutes from '../../interfaces/routes/employee/employee.routes';
