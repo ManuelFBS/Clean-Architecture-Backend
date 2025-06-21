@@ -50,3 +50,5 @@ router.get(
     asyncHandler(authorize(['Owner', 'Admin'])),
     userController.getUserByDni.bind(userController),
 );
+
+export default router;
