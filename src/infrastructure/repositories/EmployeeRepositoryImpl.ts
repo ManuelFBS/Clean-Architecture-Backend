@@ -69,17 +69,30 @@ export class EmployeeRepositoryImpl
     ): Promise<Employee> {
         const connection = await this.db.getConnection();
         await connection.query(
-            'UPDATE employees SET dni = ?, name = ?, lastName = ?, email = ?, phone = ? WHERE id = ?',
+            'UPDATE employees SET dni = ?, name = ?, lastName = ?, email = ?, phone = ?, emailVerified = ? WHERE id = ?',
             [
                 employee.dni,
                 employee.name,
                 employee.lastName,
                 employee.email,
                 employee.phone,
+                employee.emailVerified,
                 id,
             ],
         );
         return this.findById(id) as Promise<Employee>;
+    }
+
+    async updateEmailVerification(
+        dni: string,
+        verified: boolean,
+    ): Promise<void> {
+        const connection = await this.db.getConnection();
+
+        await connection.query(
+            'UPDATE employees SET emailVerified = ?, updatedAt = ? WHERE dni = ?',
+            [verified, new Date(), dni],
+        );
     }
 
     async delete(id: number): Promise<void> {
