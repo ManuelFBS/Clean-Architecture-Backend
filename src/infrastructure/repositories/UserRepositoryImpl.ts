@@ -79,4 +79,13 @@ export class UserRepositoryImpl implements UserRepository {
             [dni],
         );
     }
+
+    async countAdmins(): Promise<number> {
+        const connection = await this.db.getConnection();
+        const [rows] = await connection.query(
+            'SELECT COUNT(*) as count FROM users WHERE role IN ("Owner", "Admin")',
+        );
+
+        return (rows as any)[0].count;
+    }
 }

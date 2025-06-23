@@ -3,8 +3,12 @@ import {
     Length,
     Matches,
     IsIn,
+    IsNotEmpty,
 } from 'class-validator';
-import { UserRole } from '../../core/domain/entities/User';
+import {
+    UserCreateParams,
+    UserRole,
+} from '../../core/domain/entities/User';
 
 const passwordRegex =
     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/;
@@ -13,6 +17,7 @@ const usernameRegex = /^[a-zA-Z0-9_]{4,20}$/;
 export class CreateUserDTO {
     @IsString()
     @Length(8, 20)
+    @IsNotEmpty()
     dni: string;
 
     @IsString()
@@ -24,32 +29,38 @@ export class CreateUserDTO {
     username: string;
 
     @IsString()
-    @Length(4, 20)
+    @Length(8, 100)
     @Matches(passwordRegex, {
         message:
-            'Password must contain at least one uppercase letter, one \r\n' +
-            'lowercase letter, one number and one special character',
+            'Password must contain at least one uppercase, one lowercase, one number and one special character',
     })
     password: string;
 
     @IsIn(['Owner', 'Admin', 'Employee'])
     role: UserRole;
+
+    toDomain(): UserCreateParams {
+        return {
+            dni: this.dni,
+            username: this.username,
+            password: this.password, // Contraseña en texto plano
+            role: this.role,
+        };
+    }
 }
 
 export class UpdateUserDTO {
     @IsString()
     @Length(4, 20)
     @Matches(usernameRegex, {
-        message:
-            'Username must contain only letters, numbers and underscores',
+        message: 'Invalid username format',
     })
     username?: string;
 
     @IsString()
     @Length(8, 100)
     @Matches(passwordRegex, {
-        message:
-            'Password must contain at least one uppercase letter, one lowercase letter, one number and one special character',
+        message: 'Password too weak',
     })
     password?: string;
 
@@ -59,8 +70,10 @@ export class UpdateUserDTO {
 
 export class LoginDTO {
     @IsString()
+    @Length(4, 20)
     username: string;
 
     @IsString()
+    @Length(8, 100)
     password: string;
 }

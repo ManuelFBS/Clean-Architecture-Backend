@@ -1,16 +1,20 @@
-import { User, UserRole } from '../../domain/entities/User';
+import {
+    User,
+    UserCreateParams,
+} from '../../domain/entities/User';
 import { UserRepository } from '../../domain/repositories/UserRepository';
 import { EmployeeRepository } from '../../domain/repositories/EmployeeRepository';
 import { EmailService } from '../../domain/services/EmailService';
+import {
+    BadRequestError,
+    NotFoundError,
+    ConflictError,
+    UnauthorizedError,
+    ForbiddenError,
+} from '../../../shared/errors/AppError';
 import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import {
-    BadRequestError,
-    ConflictError,
-    NotFoundError,
-    UnauthorizedError,
-} from '../../../shared/errors/AppError';
 
 dotenv.config();
 
@@ -29,18 +33,27 @@ export class UserUseCases {
             await this.userRepository.findByUsername(
                 username,
             );
-
         if (!user) {
-            throw new Error('User not found...!');
+            throw new UnauthorizedError(
+                'Invalid credentials',
+            );
         }
 
-        const isPasswordValid = await bcrypt.compare(
-            password,
-            user.password,
-        );
+        const isValidPassword =
+            await user.validatePassword(password);
+        if (!isValidPassword) {
+            throw new UnauthorizedError(
+                'Invalid credentials',
+            );
+        }
 
-        if (!isPasswordValid) {
-            throw new Error('Invalid password...!');
+        const employee =
+            await this.employeeRepository.findByDNI(
+                user.dni,
+            );
+
+        if (employee && !employee.emailVerified) {
+            throw new ForbiddenError('Email not verified');
         }
 
         const token = jwt.sign(
@@ -59,43 +72,111 @@ export class UserUseCases {
         return { token, user };
     }
 
-    async createUser(user: User): Promise<User> {
+    async createUser(
+        userData: UserCreateParams,
+    ): Promise<User> {
+        //* Validar que el empleado exista...
+        const employee =
+            await this.employeeRepository.findByDNI(
+                userData.dni,
+            );
+        if (!employee) {
+            throw new NotFoundError('Employee not found');
+        }
+
+        //* Validar username único...
         const existingUser =
             await this.userRepository.findByUsername(
-                user.username,
+                userData.username,
             );
         if (existingUser) {
-            throw new Error('Username already exists...!');
-        }
-
-        const existingUserByDNI =
-            await this.userRepository.findByDNI(user.dni);
-        if (existingUserByDNI) {
-            throw new Error(
-                'User with this DNI already exists...!',
+            throw new ConflictError(
+                'Username already exists',
             );
         }
 
-        return this.userRepository.create(user);
+        //* Validar que no exista otro usuario con el mismo DNI...
+        const existingUserByDNI =
+            await this.userRepository.findByDNI(
+                userData.dni,
+            );
+        if (existingUserByDNI) {
+            throw new ConflictError(
+                'User already exists for this employee',
+            );
+        }
+
+        //* Validar que solo haya un Owner...
+        if (userData.role === 'Owner') {
+            const adminCount =
+                await this.userRepository.countAdmins();
+            if (adminCount > 0) {
+                throw new BadRequestError(
+                    'There can only be one Owner',
+                );
+            }
+        }
+
+        // return this.userRepository.create(userData);
+        return User.create(userData);
     }
 
     async updateUser(
         dni: string,
-        user: Partial<User>,
+        userData: Partial<User>,
     ): Promise<User> {
-        if (user.username) {
-            const existingUser =
+        const existingUser =
+            await this.userRepository.findByDNI(dni);
+        if (!existingUser) {
+            throw new NotFoundError('User not found');
+        }
+
+        //* Validar username único si se está cambiando
+        if (
+            userData.username &&
+            userData.username !== existingUser.username
+        ) {
+            const userWithSameUsername =
                 await this.userRepository.findByUsername(
-                    user.username,
+                    userData.username,
                 );
-            if (existingUser && existingUser.dni !== dni) {
-                throw new Error('Username already exists');
+            if (userWithSameUsername) {
+                throw new ConflictError(
+                    'Username already taken',
+                );
             }
         }
-        return this.userRepository.update(dni, user);
+
+        // Validar que no se cambie el rol a Owner si ya existe uno
+        if (userData.role === 'Owner') {
+            const adminCount =
+                await this.userRepository.countAdmins();
+            if (
+                adminCount > 0 &&
+                existingUser.role !== 'Owner'
+            ) {
+                throw new BadRequestError(
+                    'There can only be one Owner',
+                );
+            }
+        }
+
+        return this.userRepository.update(dni, userData);
     }
 
     async deleteUser(dni: string): Promise<void> {
+        const user =
+            await this.userRepository.findByDNI(dni);
+        if (!user) {
+            throw new NotFoundError('User not found');
+        }
+
+        if (user.role === 'Owner') {
+            throw new ForbiddenError(
+                'Cannot delete Owner user',
+            );
+        }
+
         return this.userRepository.delete(dni);
     }
 
@@ -103,6 +184,7 @@ export class UserUseCases {
         return this.userRepository.findByDNI(dni);
     }
 
+    /*
     async sendVerificationEmail(
         dni: string,
     ): Promise<void> {
@@ -180,4 +262,5 @@ export class UserUseCases {
             throw error;
         }
     }
+    */
 }
