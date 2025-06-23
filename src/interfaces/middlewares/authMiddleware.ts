@@ -1,7 +1,16 @@
 import { Request, Response, NextFunction } from 'express';
+import {
+    Permission,
+    RolePermissions,
+} from '../../core/domain/types/Permission';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import { Next } from 'mysql2/typings/mysql/lib/parsers/typeCast';
+import {
+    ForbiddenError,
+    UnauthorizedError,
+} from '../../shared/errors/AppError';
+import { UserRole } from '../../core/domain/entities/User';
+import { permission } from 'process';
 
 dotenv.config();
 
@@ -50,16 +59,39 @@ export function authenticate(
     }
 }
 
-export function authorize(roles: string[]) {
+export function authorize(
+    permissions: Permission | Permission[],
+) {
     return (
         req: AuthenticatedRequest,
         res: Response,
         next: NextFunction,
     ) => {
-        if (!req.user || !roles.includes(req.user.role)) {
-            return res
-                .status(403)
-                .json({ message: 'Forbidden' });
+        if (!req.user) {
+            throw new UnauthorizedError(
+                'Authentication required...',
+            );
+        }
+
+        const requiredPermissions = Array.isArray(
+            permissions,
+        )
+            ? permissions
+            : [permissions];
+
+        const userPermissions =
+            RolePermissions[req.user.role as UserRole] ||
+            [];
+
+        const hasPermission = requiredPermissions.every(
+            (permission) =>
+                userPermissions.includes(permission),
+        );
+
+        if (!hasPermission) {
+            throw new ForbiddenError(
+                'Insufficient permissions...',
+            );
         }
 
         next();
