@@ -4,11 +4,17 @@ import {
     CreateEmployeeDTO,
     UpdateEmployeeDTO,
 } from '../dtos/EmployeeDTO';
+import { validationMiddleware } from '../middlewares/validationMiddleware';
+import { container } from '../../shared/container';
+import logger from '../../shared/logger';
 
 export class EmployeeController {
-    constructor(
-        private employeeUseCases: EmployeeUseCases,
-    ) {}
+    private employeeUseCases: EmployeeUseCases;
+    constructor() {
+        this.employeeUseCases = container.get(
+            EmployeeUseCases,
+        );
+    }
 
     async getAllEmployees(
         req: Request,
@@ -81,16 +87,27 @@ export class EmployeeController {
         res: Response,
     ): Promise<void> {
         try {
-            const employeeData: CreateEmployeeDTO =
-                req.body;
+            const employeeData = new CreateEmployeeDTO();
+            Object.assign(employeeData, req.body);
+
+            const employeeDomain = employeeData.toDomain();
             const newEmployee =
                 await this.employeeUseCases.createEmployee(
-                    employeeData,
+                    employeeDomain,
                 );
+
+            logger.info(
+                `Employee created with ID: ${newEmployee.id}`,
+            );
 
             res.status(201).json(newEmployee);
         } catch (error: any) {
-            res.status(400).json({
+            logger.error(
+                `Error creating employee: ${error.message}`,
+                { error },
+            );
+            res.status(error.statusCode || 500).json({
+                status: 'error',
                 message: error.message,
             });
         }

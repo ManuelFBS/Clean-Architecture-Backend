@@ -1,21 +1,21 @@
 import { Router } from 'express';
 import { EmployeeController } from '../../controllers/Employee.Controller';
-import { EmployeeRepositoryImpl } from '../../../infrastructure/repositories/EmployeeRepositoryImpl';
-import { EmployeeUseCases } from '../../../core/usecases/employee/EmployeeUseCases';
+// import { EmployeeRepositoryImpl } from '../../../infrastructure/repositories/EmployeeRepositoryImpl';
+// import { EmployeeUseCases } from '../../../core/usecases/employee/EmployeeUseCases';
 import {
     authenticate,
     authorize,
 } from '../../middlewares/authMiddleware';
+import { validationMiddleware } from '../../middlewares/validationMiddleware';
+import { CreateEmployeeDTO } from '../../dtos/EmployeeDTO';
 
 const router = Router();
 
-const employeeRepository = new EmployeeRepositoryImpl();
-const employeeUseCases = new EmployeeUseCases(
-    employeeRepository,
-);
-const employeeController = new EmployeeController(
-    employeeUseCases,
-);
+// const employeeRepository = new EmployeeRepositoryImpl();
+// const employeeUseCases = new EmployeeUseCases(
+//     employeeRepository,
+// );
+const employeeController = new EmployeeController();
 
 //~ Función wrapper para manejar promesas...
 const asyncHandler =
@@ -26,7 +26,7 @@ const asyncHandler =
 router.get(
     '/',
     authenticate,
-    asyncHandler(authorize(['Owner', 'Admin'])),
+    asyncHandler(authorize(['employee:create'])),
     employeeController.getAllEmployees.bind(
         employeeController,
     ),
@@ -35,7 +35,7 @@ router.get(
 router.get(
     '/:id',
     authenticate,
-    asyncHandler(authorize(['Owner', 'Admin', 'Employee'])),
+    asyncHandler(authorize(['employee:read', 'user:read'])),
     employeeController.getEmployeeById.bind(
         employeeController,
     ),
@@ -44,7 +44,7 @@ router.get(
 router.get(
     '/bydni',
     authenticate,
-    asyncHandler(authorize(['Owner', 'Admin', 'Employee'])),
+    asyncHandler(authorize(['employee:read', 'user:read'])),
     employeeController.getEmployeeByDNI.bind(
         employeeController,
     ),
@@ -53,7 +53,8 @@ router.get(
 router.post(
     '/newemployee',
     authenticate,
-    asyncHandler(authorize(['Owner', 'Admin'])),
+    asyncHandler(authorize(['employee:create'])),
+    validationMiddleware(CreateEmployeeDTO),
     employeeController.createEmployee.bind(
         employeeController,
     ),
@@ -62,7 +63,7 @@ router.post(
 router.put(
     '/:id',
     authenticate,
-    asyncHandler(authorize(['Owner', 'Admin'])),
+    asyncHandler(authorize(['employee:update'])),
     employeeController.updateEmployee.bind(
         employeeController,
     ),
@@ -71,7 +72,7 @@ router.put(
 router.delete(
     '/:id',
     authenticate,
-    asyncHandler(authorize(['Owner', 'Admin'])),
+    asyncHandler(authorize(['employee:delete'])),
     employeeController.deleteEmployee.bind(
         employeeController,
     ),

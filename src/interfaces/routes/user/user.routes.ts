@@ -26,28 +26,28 @@ router.post(
 router.post(
     '/',
     authenticate,
-    asyncHandler(authorize(['Owner', 'Admin'])),
+    asyncHandler(authorize(['user:create'])),
     userController.createUser.bind(userController),
 );
 
 router.put(
     '/:dni',
     authenticate,
-    asyncHandler(authorize(['Owner', 'Admin'])),
+    asyncHandler(authorize(['user:update'])),
     userController.updateUser.bind(userController),
 );
 
 router.delete(
     '/:dni',
     authenticate,
-    asyncHandler(authorize(['Owner', 'Admin'])),
+    asyncHandler(authorize(['user:delete'])),
     userController.deleteUser.bind(userController),
 );
 
 router.get(
     '/:dni',
     authenticate,
-    asyncHandler(authorize(['Owner', 'Admin'])),
+    asyncHandler(authorize(['user:read'])),
     userController.getUserByDni.bind(userController),
 );
 

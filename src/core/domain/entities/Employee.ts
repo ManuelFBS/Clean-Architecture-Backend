@@ -8,15 +8,29 @@ export class Employee {
         public lastName: string,
         public email: string,
         public phone: string,
-        public emailVerified: boolean = false,
+        public emailVerified: boolean,
         public createdAt: Date,
         public updatedAt: Date,
         public user?: User,
     ) {}
 
-    //* Método para verificar el email...
-    verifyEmail(): void {
-        this.emailVerified = true;
-        this.updatedAt = new Date();
+    static create(
+        employeeData: Omit<
+            Employee,
+            'id' | 'createdAt' | 'updatedAt'
+        >,
+    ): Employee {
+        return new Employee(
+            0, //> ID temporal, será asignado por la base de datos
+            employeeData.dni,
+            employeeData.name,
+            employeeData.lastName,
+            employeeData.email,
+            employeeData.phone,
+            employeeData.emailVerified || false,
+            new Date(), //> createdAt
+            new Date(), //> updatedAt
+            employeeData.user,
+        );
     }
 }

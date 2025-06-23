@@ -1,5 +1,6 @@
 import { Employee } from '../../domain/entities/Employee';
 import { EmployeeRepository } from '../../domain/repositories/EmployeeRepository';
+import { ConflictError } from '../../../shared/errors/AppError';
 
 export class EmployeeUseCases {
     constructor(
@@ -23,23 +24,23 @@ export class EmployeeUseCases {
     }
 
     async createEmployee(
-        employee: Omit<
+        employeeData: Omit<
             Employee,
             'id' | 'createdAt' | 'updatedAt'
         >,
     ): Promise<Employee> {
         const existingEmployee =
             await this.employeeRepository.findByDNI(
-                employee.dni,
+                employeeData.dni,
             );
 
         if (existingEmployee) {
-            throw new Error(
-                'Employee with this DNI already exists',
+            throw new ConflictError(
+                'Employee with this DNI already exists...',
             );
         }
 
-        return this.employeeRepository.create(employee);
+        return this.employeeRepository.create(employeeData);
     }
 
     async updateEmployee(

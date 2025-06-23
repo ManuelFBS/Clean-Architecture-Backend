@@ -7,19 +7,12 @@ export interface EmployeeRepository {
     create(
         employee: Omit<
             Employee,
-            | 'id'
-            | 'createdAt'
-            | 'updatedAt'
-            | 'emailVerified'
+            'id' | 'createdAt' | 'updatedAt'
         >,
     ): Promise<Employee>;
     update(
         id: number,
         employee: Partial<Employee>,
     ): Promise<Employee>;
-    updateEmailVerification(
-        dni: string,
-        verified: boolean,
-    ): Promise<void>;
     delete(id: number): Promise<void>;
 }

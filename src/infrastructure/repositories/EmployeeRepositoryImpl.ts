@@ -49,13 +49,14 @@ export class EmployeeRepositoryImpl
     ): Promise<Employee> {
         const connection = await this.db.getConnection();
         const [result] = await connection.query(
-            'INSERT INTO employees (dni, name, lastName, email, phone) VALUES (?, ?, ?, ?, ?)',
+            'INSERT INTO employees (dni, name, lastName, email, phone, emailVerified) VALUES (?, ?, ?, ?, ?, ?)',
             [
                 employee.dni,
                 employee.name,
                 employee.lastName,
                 employee.email,
                 employee.phone,
+                employee.emailVerified || false,
             ],
         );
         const insertId = (result as any).insertId;

@@ -3,8 +3,8 @@ import {
     IsEmail,
     IsPhoneNumber,
     Length,
-    Matches,
 } from 'class-validator';
+import { Employee } from '../../core/domain/entities/Employee';
 
 export class CreateEmployeeDTO {
     @IsString()
@@ -24,6 +24,21 @@ export class CreateEmployeeDTO {
 
     @IsPhoneNumber()
     phone: string;
+
+    toDomain(): Omit<
+        Employee,
+        'id' | 'createdAt' | 'updatedAt'
+    > {
+        return {
+            dni: this.dni,
+            name: this.name,
+            lastName: this.lastName,
+            email: this.email,
+            phone: this.phone,
+            emailVerified: false,
+            user: undefined,
+        };
+    }
 }
 
 export class UpdateEmployeeDTO {
