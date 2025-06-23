@@ -10,20 +10,11 @@ import {
     UnauthorizedError,
 } from '../../shared/errors/AppError';
 import { UserRole } from '../../core/domain/entities/User';
-import { permission } from 'process';
 
 dotenv.config();
 
-export interface AuthenticatedRequest extends Request {
-    user?: {
-        dni: string;
-        user: string;
-        role: string;
-    };
-}
-
 export function authenticate(
-    req: AuthenticatedRequest,
+    req: Request,
     res: Response,
     next: NextFunction,
 ): void {
@@ -45,12 +36,12 @@ export function authenticate(
         ) as {
             dni: string;
             username: string;
-            role: string;
+            role: UserRole;
         };
 
         req.user = {
             dni: decoded.dni,
-            user: decoded.username,
+            username: decoded.username,
             role: decoded.role,
         };
         next();
@@ -63,7 +54,7 @@ export function authorize(
     permissions: Permission | Permission[],
 ) {
     return (
-        req: AuthenticatedRequest,
+        req: Request,
         res: Response,
         next: NextFunction,
     ) => {

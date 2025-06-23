@@ -4,6 +4,10 @@
         "module": "commonjs",
         "outDir": "./dist",
         "rootDir": "./src",
+        "typeRoots": [
+            "./node_modules/@types",
+            "./src/interfaces/types"
+        ],
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true,
         "strictPropertyInitialization": false,

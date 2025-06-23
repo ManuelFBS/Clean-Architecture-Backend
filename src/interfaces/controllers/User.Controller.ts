@@ -1,3 +1,7 @@
+import {
+    hasPermission,
+    Permission,
+} from '../../core/domain/types/Permission';
 import { Request, Response } from 'express';
 import { UserUseCases } from '../../core/usecases/user/UserUseCases';
 import {
@@ -12,7 +16,11 @@ import {
 } from '../middlewares/authMiddleware';
 import { container } from '../../shared/container';
 import logger from '../../shared/logger';
-import { NotFoundError } from '../../shared/errors/AppError';
+import {
+    ForbiddenError,
+    NotFoundError,
+    UnauthorizedError,
+} from '../../shared/errors/AppError';
 
 export class UserController {
     private userUseCases: UserUseCases;
@@ -51,10 +59,36 @@ export class UserController {
         res: Response,
     ): Promise<void> {
         try {
+            //> 1. Verificación segura del usuario autenticado...
+            if (!req.user) {
+                throw new UnauthorizedError(
+                    'Authentication required',
+                );
+            }
+
+            //> 2. Verificación de permisos con seguridad de tipos...
+            if (
+                !hasPermission(req.user.role, 'user:create')
+            ) {
+                throw new ForbiddenError(
+                    'Insufficient permissions',
+                );
+            }
+
             const userData = new CreateUserDTO();
             Object.assign(userData, req.body);
 
-            //> // Convertir DTO a formato de dominio (sin hash aún)...
+            //> Validación adicional para creación de Owners...
+            if (
+                userData.role === 'Owner' &&
+                req.user.role !== 'Owner'
+            ) {
+                throw new ForbiddenError(
+                    'Only Owners can create other Owners...',
+                );
+            }
+
+            //> Convertir DTO a formato de dominio (sin hash aún)...
             const userParams = userData.toDomain();
 
             const newUser =
@@ -65,7 +99,13 @@ export class UserController {
             logger.info(
                 `User created: ${newUser.username}`,
             );
-            res.status(201).json(newUser);
+
+            res.status(201).json({
+                dni: newUser.dni,
+                username: newUser.username,
+                role: newUser.role,
+                createdAt: newUser.createdAt,
+            });
         } catch (error: any) {
             logger.error(
                 `Error creating user: ${error.message}`,

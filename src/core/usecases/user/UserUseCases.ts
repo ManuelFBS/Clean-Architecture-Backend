@@ -1,3 +1,4 @@
+import { injectable, inject } from 'inversify';
 import {
     User,
     UserCreateParams,
@@ -12,16 +13,19 @@ import {
     UnauthorizedError,
     ForbiddenError,
 } from '../../../shared/errors/AppError';
-import bcrypt from 'bcrypt';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
 dotenv.config();
 
+@injectable()
 export class UserUseCases {
     constructor(
+        @inject('UserRepository')
         private userRepository: UserRepository,
+        @inject('EmailService')
         private emailService: EmailService,
+        @inject('EmployeeRepository')
         private employeeRepository: EmployeeRepository,
     ) {}
 
@@ -117,7 +121,6 @@ export class UserUseCases {
             }
         }
 
-        // return this.userRepository.create(userData);
         return User.create(userData);
     }
 

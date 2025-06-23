@@ -4,9 +4,10 @@
     "description": "Este es otro Backend, al igual que el anterior, pero con una organización más extendida,\r contando con manejo de errores más sofisticado, validaciones más precisas y testings.",
     "main": "dist/index.js",
     "scripts": {
-        "start": "ts-node src/index.ts",
-        "build": "tsc",
+        "start": "node dist/index.js",
         "dev": "ts-node src/index.ts",
+        "debug": "$env:NODE_ENV='development'; ts-node src/index.ts",
+        "build": "tsc",
         "test": "echo \"Error: no test specified\" && exit 1"
     },
     "repository": {
@@ -40,8 +41,11 @@
         "@types/bcrypt": "^5.0.2",
         "@types/cors": "^2.8.19",
         "@types/express": "^5.0.3",
+        "@types/inversify": "^2.0.32",
         "@types/jsonwebtoken": "^9.0.9",
         "@types/node": "^22.15.32",
+        "cross-env": "^7.0.3",
+        "nodemon": "^3.1.10",
         "prettier": "^3.5.3",
         "ts-node": "^10.9.2",
         "typescript": "^5.8.3"
