@@ -1,9 +1,12 @@
+import { injectable, inject } from 'inversify';
 import { Employee } from '../../domain/entities/Employee';
 import { EmployeeRepository } from '../../domain/repositories/EmployeeRepository';
 import { ConflictError } from '../../../shared/errors/AppError';
 
+@injectable()
 export class EmployeeUseCases {
     constructor(
+        @inject('EmployeeRepository')
         private employeeRepository: EmployeeRepository,
     ) {}
 

@@ -11,10 +11,6 @@ import { CreateEmployeeDTO } from '../../dtos/EmployeeDTO';
 
 const router = Router();
 
-// const employeeRepository = new EmployeeRepositoryImpl();
-// const employeeUseCases = new EmployeeUseCases(
-//     employeeRepository,
-// );
 const employeeController = new EmployeeController();
 
 //~ Función wrapper para manejar promesas...

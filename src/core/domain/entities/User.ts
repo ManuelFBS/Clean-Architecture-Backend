@@ -1,39 +1,12 @@
 import { Employee } from './Employee';
 import bcrypt from 'bcrypt';
 
-export type UserRole = 'Owner' | 'Admin' | 'Employee';
-
-// export class User {
-//     constructor(
-//         public dni: string,
-//         public username: string,
-//         public password: string,
-//         public role: UserRole,
-//         public createdAt: Date = new Date(),
-//         public updatedAt: Date = new Date(),
-//         public employee?: Employee,
-//     ) {}
-
-//     static create(
-//         userData: Omit<User, 'createdAt' | 'updatedAt'>,
-//     ): User {
-//         return new User(
-//             userData.dni,
-//             userData.username,
-//             userData.password,
-//             userData.role,
-//             new Date(),
-//             new Date(),
-//             userData.employee,
-//         );
-//     }
-
-//     public validatePassword(
-//         password: string,
-//     ): Promise<boolean> {
-//         return bcrypt.compare(password, this.password);
-//     }
-// }
+export const UserRoles = [
+    'Owner',
+    'Admin',
+    'Employee',
+] as const;
+export type UserRole = (typeof UserRoles)[number];
 
 export interface IUser {
     dni: string;

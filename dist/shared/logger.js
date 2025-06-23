@@ -1,3 +1,4 @@
+"use strict";
 /*import winston from 'winston';
 import DailyRotateFile from 'winston-daily-rotate-file';
 import path from 'path';
@@ -72,20 +73,17 @@ if (process.env.NODE_ENV === 'development') {
 
 export default logger;
 */
-
+Object.defineProperty(exports, "__esModule", { value: true });
 // src/shared/logger.ts
-import { Console } from 'console';
-
-const logger = new Console({
+const console_1 = require("console");
+const logger = new console_1.Console({
     stdout: process.stdout,
     stderr: process.stderr,
     colorMode: true,
 });
-
-export default {
-    info: (...args: any) => logger.log('[INFO]', ...args),
-    error: (...args: any) =>
-        logger.error('[ERROR]', ...args),
-    warn: (...args: any) => logger.warn('[WARN]', ...args),
-    debug: (...args: any) => logger.log('[DEBUG]', ...args),
+exports.default = {
+    info: (...args) => logger.log('[INFO]', ...args),
+    error: (...args) => logger.error('[ERROR]', ...args),
+    warn: (...args) => logger.warn('[WARN]', ...args),
+    debug: (...args) => logger.log('[DEBUG]', ...args),
 };
