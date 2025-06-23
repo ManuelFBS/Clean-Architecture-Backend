@@ -39,3 +39,10 @@ export const RolePermissions: Record<
     ],
     Employee: ['employee:read', 'user:read'],
 };
+
+export function hasPermission(
+    role: UserRole,
+    permission: Permission,
+): boolean {
+    return RolePermissions[role].includes(permission);
+}
