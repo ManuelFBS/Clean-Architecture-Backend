@@ -1,91 +1,32 @@
-/*import winston from 'winston';
-import DailyRotateFile from 'winston-daily-rotate-file';
-import path from 'path';
-
-//~ Configuración básica de formato...
-const logFormat = winston.format.combine(
-    winston.format.timestamp({
-        format: 'YYYY-MM-DD HH:mm:ss',
-    }),
-    winston.format.errors({ stack: true }),
-    winston.format.printf(
-        ({ timestamp, level, message, stack }) => {
-            return `${timestamp} [${level}]: ${stack || message}`;
-        },
-    ),
-);
-
-//~ Configuración de transports...
-const transports = [
-    new winston.transports.Console({
-        format: winston.format.combine(
-            winston.format.colorize(),
-            logFormat,
-        ),
-        level: 'debug',
-    }),
-    new DailyRotateFile({
-        filename: path.join(
-            'logs',
-            'application-%DATE%.log',
-        ),
-        datePattern: 'YYYY-MM-DD',
-        zippedArchive: true,
-        maxSize: '20m',
-        maxFiles: '30d',
-        format: logFormat,
-        level: 'info',
-    }),
-];
-
-//~ Creación del logger...
-const logger = winston.createLogger({
-    level:
-        process.env.NODE_ENV === 'production'
-            ? 'info'
-            : 'debug',
-    transports,
-    exceptionHandlers: [
-        new DailyRotateFile({
-            filename: path.join(
-                'logs',
-                'exceptions-%DATE%.log',
-            ),
-            datePattern: 'YYYY-MM-DD',
-            zippedArchive: true,
-            maxSize: '20m',
-            maxFiles: '30d',
-        }),
-    ],
-    exitOnError: false, //> ¡Importante para evitar bucles!...
-});
-
-//~ Solo para desarrollo...
-if (process.env.NODE_ENV === 'development') {
-    logger.add(
-        new winston.transports.Console({
-            format: winston.format.simple(),
-            level: 'debug',
-        }),
-    );
-}
-
-export default logger;
-*/
-
-// src/shared/logger.ts
+/*
 import { Console } from 'console';
 
-const logger = new Console({
+export const Logger = new Console({
     stdout: process.stdout,
     stderr: process.stderr,
     colorMode: true,
 });
 
 export default {
-    info: (...args: any) => logger.log('[INFO]', ...args),
+    info: (...args: any) => Logger.log('[INFO]', ...args),
     error: (...args: any) =>
-        logger.error('[ERROR]', ...args),
-    warn: (...args: any) => logger.warn('[WARN]', ...args),
-    debug: (...args: any) => logger.log('[DEBUG]', ...args),
+        Logger.error('[ERROR]', ...args),
+    warn: (...args: any) => Logger.warn('[WARN]', ...args),
+    debug: (...args: any) => Logger.log('[DEBUG]', ...args),
 };
+*/
+
+export class Logger {
+    info(...args: any[]) {
+        console.log('[INFO]', ...args);
+    }
+    error(...args: any[]) {
+        console.error('[ERROR]', ...args);
+    }
+    warn(...args: any[]) {
+        console.warn('[WARN]', ...args);
+    }
+    debug(...args: any[]) {
+        console.log('[DEBUG]', ...args);
+    }
+}

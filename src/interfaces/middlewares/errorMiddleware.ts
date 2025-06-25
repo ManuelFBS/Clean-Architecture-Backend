@@ -3,7 +3,7 @@ import { AppError } from '../../shared/errors/AppError';
 import logger from '../../shared/logger';
 import { stat } from 'fs';
 
-export function errorMiddleware(
+export function ErrorMiddleware(
     err: Error,
     req: Request,
     res: Response,

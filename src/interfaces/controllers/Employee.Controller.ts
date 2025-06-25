@@ -1,3 +1,4 @@
+import { injectable, inject } from 'inversify';
 import { Request, Response } from 'express';
 import { EmployeeUseCases } from '../../core/usecases/employee/EmployeeUseCases';
 import {
@@ -6,11 +7,15 @@ import {
 } from '../dtos/EmployeeDTO';
 import { validationMiddleware } from '../middlewares/validationMiddleware';
 import { container } from '../../shared/container';
-import logger from '../../shared/logger';
+import { Logger } from '../../shared/logger';
+import { TYPES } from '../../shared/constants/TYPES';
 
+@injectable()
 export class EmployeeController {
     private employeeUseCases: EmployeeUseCases;
-    constructor() {
+    constructor(
+        @inject(TYPES.Logger) private logger: Logger,
+    ) {
         this.employeeUseCases = container.get(
             EmployeeUseCases,
         );
@@ -96,13 +101,13 @@ export class EmployeeController {
                     employeeDomain,
                 );
 
-            logger.info(
+            this.logger.info(
                 `Employee created with ID: ${newEmployee.id}`,
             );
 
             res.status(201).json(newEmployee);
         } catch (error: any) {
-            logger.error(
+            this.logger.error(
                 `Error creating employee: ${error.message}`,
                 { error },
             );

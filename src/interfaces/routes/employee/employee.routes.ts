@@ -9,7 +9,7 @@ import {
 import { validationMiddleware } from '../../middlewares/validationMiddleware';
 import { CreateEmployeeDTO } from '../../dtos/EmployeeDTO';
 
-const router = Router();
+const EmployeeRoutes = Router();
 
 const employeeController = new EmployeeController();
 
@@ -19,7 +19,7 @@ const asyncHandler =
         Promise.resolve(fn(req, res, next)).catch(next);
     };
 
-router.get(
+EmployeeRoutes.get(
     '/',
     authenticate,
     asyncHandler(authorize(['employee:create'])),
@@ -28,7 +28,7 @@ router.get(
     ),
 );
 
-router.get(
+EmployeeRoutes.get(
     '/:id',
     authenticate,
     asyncHandler(authorize(['employee:read', 'user:read'])),
@@ -37,7 +37,7 @@ router.get(
     ),
 );
 
-router.get(
+EmployeeRoutes.get(
     '/bydni',
     authenticate,
     asyncHandler(authorize(['employee:read', 'user:read'])),
@@ -46,7 +46,7 @@ router.get(
     ),
 );
 
-router.post(
+EmployeeRoutes.post(
     '/newemployee',
     authenticate,
     asyncHandler(authorize(['employee:create'])),
@@ -56,7 +56,7 @@ router.post(
     ),
 );
 
-router.put(
+EmployeeRoutes.put(
     '/:id',
     authenticate,
     asyncHandler(authorize(['employee:update'])),
@@ -65,7 +65,7 @@ router.put(
     ),
 );
 
-router.delete(
+EmployeeRoutes.delete(
     '/:id',
     authenticate,
     asyncHandler(authorize(['employee:delete'])),
@@ -74,4 +74,4 @@ router.delete(
     ),
 );
 
-export default router;
+export { EmployeeRoutes };

@@ -15,11 +15,11 @@ import {
     authLimiter,
 } from '../../middlewares/rateLimiter';
 
-const router = Router();
+const UserRoutes = Router();
 const userController = new UserController();
 
 //~ Rutas públicas...
-router.post(
+UserRoutes.post(
     '/login',
     authLimiter,
     validationMiddleware(LoginDTO),
@@ -27,7 +27,7 @@ router.post(
 );
 
 //~ Rutas autenticadas...
-router.post(
+UserRoutes.post(
     '/newuser',
     authenticate,
     authorize(['user:create']),
@@ -36,7 +36,7 @@ router.post(
     userController.createUser.bind(userController),
 );
 
-router.put(
+UserRoutes.put(
     '/:dni',
     authenticate,
     authorize(['user:update']),
@@ -45,7 +45,7 @@ router.put(
     userController.updateUser.bind(userController),
 );
 
-router.delete(
+UserRoutes.delete(
     '/:dni',
     authenticate,
     authorize(['user:delete']),
@@ -53,11 +53,11 @@ router.delete(
     userController.deleteUser.bind(userController),
 );
 
-router.get(
+UserRoutes.get(
     '/:dni',
     authenticate,
     authorize(['user:create']),
     userController.getUserByDNI.bind(userController),
 );
 
-export default router;
+export { UserRoutes };

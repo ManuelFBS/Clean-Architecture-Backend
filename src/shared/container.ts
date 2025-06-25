@@ -9,40 +9,52 @@ import { UserRepository } from '../core/domain/repositories/UserRepository';
 import { UserRepositoryImpl } from '../infrastructure/repositories/UserRepositoryImpl';
 import { EmailService } from '../core/domain/services/EmailService';
 import { EmailServiceImpl } from '../infrastructure/services/EmailServiceImpl';
+import { Server } from '../infrastructure/web/server';
+import { Logger } from '../shared/logger';
+import { TYPES } from './constants/TYPES';
 
 const container = new Container();
 
-//~ Configuración...
+//~ Configuración de los bindings...
+//* Base de datos...
 container
     .bind<Database>(Database)
     .toSelf()
     .inSingletonScope();
 
-//~ Repositorios...
+//* Repositorios...
 container
-    .bind<EmployeeRepository>('EmployeeRepository')
+    .bind<EmployeeRepository>(TYPES.EmployeeRepository)
     .to(EmployeeRepositoryImpl)
     .inSingletonScope();
 
 container
-    .bind<UserRepository>('UserRepository')
+    .bind<UserRepository>(TYPES.UserRepository)
     .to(UserRepositoryImpl)
     .inSingletonScope();
 
-//~ Servicios...
+//* Servicios...
 container
-    .bind<EmailService>('EmailService')
+    .bind<EmailService>(TYPES.EmailService)
     .to(EmailServiceImpl)
     .inSingletonScope();
 
-//~ Casos de uso...
+//* Casos de uso...
 container
     .bind<EmployeeUseCases>(EmployeeUseCases)
     .toSelf()
     .inSingletonScope();
+
 container
     .bind<UserUseCases>(UserUseCases)
     .toSelf()
+    .inSingletonScope();
+
+//* Nuevos bindings para el Server y dependencias...
+container.bind<Server>(Server).toSelf().inSingletonScope();
+container
+    .bind<Logger>(TYPES.Logger)
+    .to(Logger)
     .inSingletonScope();
 
 export { container };

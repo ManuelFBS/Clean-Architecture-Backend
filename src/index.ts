@@ -1,10 +1,10 @@
-console.log('🟢 INICIANDO SERVIDOR');
-
+import 'reflect-metadata'; // Debe ser siempre la primera línea
 import { container } from './shared/container';
+import { Server } from './infrastructure/web/server';
+
 console.log('🟢 INICIANDO SERVIDOR');
-import Server from './infrastructure/web/server';
 
 //~ Resuelve las dependencias del servidor...
-const server = container.resolve(Server);
+const server = container.get<Server>(Server);
 
 server.start();

@@ -1,3 +1,4 @@
+import { injectable, inject } from 'inversify';
 import {
     hasPermission,
     Permission,
@@ -15,17 +16,21 @@ import {
     authorize,
 } from '../middlewares/authMiddleware';
 import { container } from '../../shared/container';
-import logger from '../../shared/logger';
+import { Logger } from '../../shared/logger';
 import {
     ForbiddenError,
     NotFoundError,
     UnauthorizedError,
 } from '../../shared/errors/AppError';
+import { TYPES } from '../../shared/constants/TYPES';
 
+@injectable()
 export class UserController {
     private userUseCases: UserUseCases;
 
-    constructor() {
+    constructor(
+        @inject(TYPES.Logger) private logger: Logger,
+    ) {
         this.userUseCases = container.get(UserUseCases);
     }
 
@@ -43,10 +48,14 @@ export class UserController {
                     loginData.password,
                 );
 
-            logger.info(`User logged in: ${user.username}`);
+            this.logger.info(
+                `User logged in: ${user.username}`,
+            );
             res.status(200).json({ token, user });
         } catch (error: any) {
-            logger.error(`Login failed: ${error.message}`);
+            this.logger.error(
+                `Login failed: ${error.message}`,
+            );
             res.status(error.statusCode || 401).json({
                 status: 'error',
                 message: error.message,
@@ -96,7 +105,7 @@ export class UserController {
                     userParams,
                 );
 
-            logger.info(
+            this.logger.info(
                 `User created: ${newUser.username}`,
             );
 
@@ -107,7 +116,7 @@ export class UserController {
                 createdAt: newUser.createdAt,
             });
         } catch (error: any) {
-            logger.error(
+            this.logger.error(
                 `Error creating user: ${error.message}`,
             );
             res.status(error.statusCode || 400).json({
@@ -132,12 +141,12 @@ export class UserController {
                     updateData,
                 );
 
-            logger.info(
+            this.logger.info(
                 `User updated: ${updatedUser.username}`,
             );
             res.status(200).json(updatedUser);
         } catch (error: any) {
-            logger.error(
+            this.logger.error(
                 `Error updating user: ${error.message}`,
             );
             res.status(error.statusCode || 400).json({
@@ -155,10 +164,10 @@ export class UserController {
             const { dni } = req.params;
             await this.userUseCases.deleteUser(dni);
 
-            logger.info(`User deleted: ${dni}`);
+            this.logger.info(`User deleted: ${dni}`);
             res.status(204).send();
         } catch (error: any) {
-            logger.error(
+            this.logger.error(
                 `Error deleting user: ${error.message}`,
             );
             res.status(error.statusCode || 400).json({
@@ -183,7 +192,7 @@ export class UserController {
 
             res.status(200).json(user);
         } catch (error: any) {
-            logger.error(
+            this.logger.error(
                 `Error getting user: ${error.message}`,
             );
             res.status(error.statusCode || 400).json({
