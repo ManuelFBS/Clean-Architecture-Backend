@@ -13,6 +13,13 @@ import { UserRole } from '../../core/domain/entities/User';
 
 dotenv.config();
 
+// Define the user type for type safety
+interface AuthenticatedUser {
+    dni: string;
+    username: string;
+    role: UserRole;
+}
+
 export function authenticate(
     req: Request,
     res: Response,
@@ -39,7 +46,8 @@ export function authenticate(
             role: UserRole;
         };
 
-        req.user = {
+        // Use type assertion to add user property
+        (req as any).user = {
             dni: decoded.dni,
             username: decoded.username,
             role: decoded.role,
@@ -58,7 +66,12 @@ export function authorize(
         res: Response,
         next: NextFunction,
     ) => {
-        if (!req.user) {
+        // Use type assertion to access user property
+        const user = (req as any).user as
+            | AuthenticatedUser
+            | undefined;
+
+        if (!user) {
             throw new UnauthorizedError(
                 'Authentication required...',
             );
@@ -71,8 +84,7 @@ export function authorize(
             : [permissions];
 
         const userPermissions =
-            RolePermissions[req.user.role as UserRole] ||
-            [];
+            RolePermissions[user.role as UserRole] || [];
 
         const hasPermission = requiredPermissions.every(
             (permission) =>

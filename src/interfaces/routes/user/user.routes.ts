@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { container } from '../../../shared/container';
 import { UserController } from '../../controllers/User.Controller';
+import { TYPES } from '../../../shared/constants/TYPES';
 import {
     CreateUserDTO,
     UpdateUserDTO,
@@ -17,7 +18,9 @@ import {
 } from '../../middlewares/rateLimiter';
 
 const UserRoutes = Router();
-const userController = container.get(UserController);
+const userController = container.get<UserController>(
+    TYPES.UserController,
+);
 
 //~ Rutas públicas...
 UserRoutes.post(

@@ -5,21 +5,16 @@ import {
     CreateEmployeeDTO,
     UpdateEmployeeDTO,
 } from '../dtos/EmployeeDTO';
-import { validationMiddleware } from '../middlewares/validationMiddleware';
-import { container } from '../../shared/container';
 import { Logger } from '../../shared/logger';
 import { TYPES } from '../../shared/constants/TYPES';
 
 @injectable()
 export class EmployeeController {
-    private employeeUseCases: EmployeeUseCases;
     constructor(
         @inject(TYPES.Logger) private logger: Logger,
-    ) {
-        this.employeeUseCases = container.get(
-            EmployeeUseCases,
-        );
-    }
+        @inject(EmployeeUseCases)
+        private employeeUseCases: EmployeeUseCases,
+    ) {}
 
     async getAllEmployees(
         req: Request,

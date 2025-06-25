@@ -13,6 +13,7 @@ import {
     UnauthorizedError,
     ForbiddenError,
 } from '../../../shared/errors/AppError';
+import { TYPES } from '../../../shared/constants/TYPES';
 import jwt, { SignOptions } from 'jsonwebtoken';
 import dotenv from 'dotenv';
 
@@ -21,11 +22,11 @@ dotenv.config();
 @injectable()
 export class UserUseCases {
     constructor(
-        @inject('UserRepository')
+        @inject(TYPES.UserRepository)
         private userRepository: UserRepository,
-        @inject('EmailService')
+        @inject(TYPES.EmailService)
         private emailService: EmailService,
-        @inject('EmployeeRepository')
+        @inject(TYPES.EmployeeRepository)
         private employeeRepository: EmployeeRepository,
     ) {}
 
@@ -186,84 +187,4 @@ export class UserUseCases {
     async getUserByDNI(dni: string): Promise<User | null> {
         return this.userRepository.findByDNI(dni);
     }
-
-    /*
-    async sendVerificationEmail(
-        dni: string,
-    ): Promise<void> {
-        const user =
-            await this.userRepository.findByDNI(dni);
-        if (!user) {
-            throw new NotFoundError('User not found');
-        }
-
-        const employee =
-            await this.employeeRepository.findByDNI(dni);
-        if (!employee) {
-            throw new NotFoundError('Employee not found');
-        }
-
-        if (employee.emailVerified) {
-            throw new ConflictError(
-                'Email already verified',
-            );
-        }
-
-        const token = jwt.sign(
-            { dni, email: employee.email },
-            process.env.JWT_SECRET as string,
-            { expiresIn: '1d' },
-        );
-
-        await this.emailService.sendVerificationEmail(
-            employee.email,
-            token,
-        );
-    }
-
-    async verifyEmail(token: string): Promise<void> {
-        try {
-            const decoded = jwt.verify(
-                token,
-                process.env.JWT_SECRET as string,
-            ) as {
-                dni: string;
-                email: string;
-            };
-
-            const employee =
-                await this.employeeRepository.findByDNI(
-                    decoded.dni,
-                );
-            if (!employee) {
-                throw new NotFoundError(
-                    'Employee not found',
-                );
-            }
-
-            if (employee.email !== decoded.email) {
-                throw new BadRequestError(
-                    'Email does not match',
-                );
-            }
-
-            await this.employeeRepository.updateEmailVerification(
-                decoded.dni,
-                true,
-            );
-        } catch (error) {
-            if (error instanceof jwt.TokenExpiredError) {
-                throw new BadRequestError(
-                    'Verification token expired',
-                );
-            }
-            if (error instanceof jwt.JsonWebTokenError) {
-                throw new BadRequestError(
-                    'Invalid verification token',
-                );
-            }
-            throw error;
-        }
-    }
-    */
 }

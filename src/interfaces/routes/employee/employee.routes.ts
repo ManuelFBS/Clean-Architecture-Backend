@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { container } from '../../../shared/container';
 import { EmployeeController } from '../../controllers/Employee.Controller';
+import { TYPES } from '../../../shared/constants/TYPES';
 import {
     authenticate,
     authorize,
@@ -10,9 +11,10 @@ import { CreateEmployeeDTO } from '../../dtos/EmployeeDTO';
 
 const EmployeeRoutes = Router();
 
-const employeeController = container.get(
-    EmployeeController,
-);
+const employeeController =
+    container.get<EmployeeController>(
+        TYPES.EmployeeController,
+    );
 
 //~ Función wrapper para manejar promesas...
 const asyncHandler =

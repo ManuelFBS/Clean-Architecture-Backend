@@ -7,20 +7,22 @@ import { EmployeeRepositoryImpl } from '../infrastructure/repositories/EmployeeR
 import { UserUseCases } from '../core/usecases/user/UserUseCases';
 import { UserRepository } from '../core/domain/repositories/UserRepository';
 import { UserRepositoryImpl } from '../infrastructure/repositories/UserRepositoryImpl';
+import { UserController } from '../interfaces/controllers/User.Controller';
 import { EmailService } from '../core/domain/services/EmailService';
 import { EmailServiceImpl } from '../infrastructure/services/EmailServiceImpl';
 import { Server } from '../infrastructure/web/server';
 import { Logger } from '../shared/logger';
 import { TYPES } from './constants/TYPES';
+import { EmployeeController } from '../interfaces/controllers/Employee.Controller';
 
 const container = new Container();
 
 //~ Configuración de los bindings...
 //* Base de datos...
 container
-    .bind<Database>(Database)
-    .toSelf()
-    .inSingletonScope();
+    .bind<Database>(TYPES.Database)
+    .toConstantValue(Database.getInstance());
+//! .inSingletonScope();
 
 //* Repositorios...
 container
@@ -48,6 +50,17 @@ container
 container
     .bind<UserUseCases>(UserUseCases)
     .toSelf()
+    .inSingletonScope();
+
+//* Controladores...
+container
+    .bind<EmployeeController>(TYPES.EmployeeController)
+    .to(EmployeeController)
+    .inSingletonScope();
+
+container
+    .bind<UserController>(TYPES.UserController)
+    .to(UserController)
     .inSingletonScope();
 
 //* Nuevos bindings para el Server y dependencias...

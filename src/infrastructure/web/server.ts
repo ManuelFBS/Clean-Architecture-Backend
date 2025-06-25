@@ -3,8 +3,6 @@ import { injectable, inject } from 'inversify';
 import express from 'express';
 import cors from 'cors';
 import { TYPES } from '../../shared/constants/TYPES';
-import { EmployeeRoutes } from '../../interfaces/routes/employee/employee.routes';
-import { UserRoutes } from '../../interfaces/routes/user/user.routes';
 import { Database } from '../db/database';
 import dotenv from 'dotenv';
 import { ErrorMiddleware } from '../../interfaces/middlewares/errorMiddleware';
@@ -18,21 +16,14 @@ export class Server {
     private port: string | number;
 
     constructor(
-        @inject(TYPES.EmployeeRoutes)
-        private employeeRoutes: typeof EmployeeRoutes,
-        @inject(TYPES.UserRoutes)
-        private userRoutes: typeof UserRoutes,
         @inject(TYPES.Database) private database: Database,
-        @inject(TYPES.ErrorMiddleware)
-        private errorMiddleware: typeof ErrorMiddleware,
         @inject(TYPES.Logger) private logger: Logger,
     ) {
         this.app = express();
         this.port = process.env.PORT || 4500;
-        this.initializeDatabase();
         this.configureMiddleware();
-        this.configureRoutes();
         this.configureErrorHandling();
+        // La base de datos se inicializará en el método start()
     }
 
     //~ Función wrapper para manejar promesas...
@@ -41,21 +32,21 @@ export class Server {
             Promise.resolve(fn(req, res, next)).catch(next);
         };
 
-    private initializeDatabase(): void {
-        // Database.getInstance();
-        this.database
-            .getConnection()
-            .getConnection()
-            .then(() => {
-                this.logger.info('Database connected');
-            })
-            .catch((err: Error) => {
-                this.logger.error(
-                    'Database connection failed:',
-                    err,
-                );
-                process.exit(1);
-            });
+    private async initializeDatabase(): Promise<void> {
+        try {
+            const connection = await this.database
+                .getConnection()
+                .getConnection();
+            await connection.ping();
+            connection.release();
+            this.logger.info('Database connected');
+        } catch (err: any) {
+            this.logger.error(
+                'Database connection failed:',
+                err,
+            );
+            process.exit(1);
+        }
     }
 
     private configureMiddleware(): void {
@@ -64,15 +55,17 @@ export class Server {
         this.logger.info('Middlewares configured');
     }
 
-    private configureRoutes(): void {
-        this.app.use('/api/employees', this.employeeRoutes);
-        this.app.use('/api/users', this.userRoutes);
+    public configureRoutes(): void {
+        // Las rutas se configurarán después de que el contenedor esté inicializado
+        // Esto se hará desde el index.ts
+    }
+
+    public getApp(): express.Application {
+        return this.app;
     }
 
     private configureErrorHandling(): void {
-        this.app.use(
-            this.asyncHandler(this.errorMiddleware),
-        );
+        this.app.use(this.asyncHandler(ErrorMiddleware));
         this.logger.info('Error handling configured');
 
         //> Ruta de prueba para verificar el funcionamiento del Servidor...
@@ -81,7 +74,10 @@ export class Server {
         });
     }
 
-    public start(): void {
+    public async start(): Promise<void> {
+        // Inicializar la base de datos antes de iniciar el servidor
+        await this.initializeDatabase();
+
         this.app.listen(this.port, () => {
             this.logger.info(
                 `Server running on port ${this.port}`,
@@ -107,5 +103,3 @@ export class Server {
         });
     }
 }
-
-// export default Server;

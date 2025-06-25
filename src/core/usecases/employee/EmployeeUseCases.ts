@@ -2,11 +2,12 @@ import { injectable, inject } from 'inversify';
 import { Employee } from '../../domain/entities/Employee';
 import { EmployeeRepository } from '../../domain/repositories/EmployeeRepository';
 import { ConflictError } from '../../../shared/errors/AppError';
+import { TYPES } from '../../../shared/constants/TYPES';
 
 @injectable()
 export class EmployeeUseCases {
     constructor(
-        @inject('EmployeeRepository')
+        @inject(TYPES.EmployeeRepository)
         private employeeRepository: EmployeeRepository,
     ) {}
 

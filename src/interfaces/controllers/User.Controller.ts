@@ -10,12 +10,6 @@ import {
     UpdateUserDTO,
     LoginDTO,
 } from '../dtos/UserDTO';
-import { validationMiddleware } from '../middlewares/validationMiddleware';
-import {
-    authenticate,
-    authorize,
-} from '../middlewares/authMiddleware';
-import { container } from '../../shared/container';
 import { Logger } from '../../shared/logger';
 import {
     ForbiddenError,
@@ -23,16 +17,15 @@ import {
     UnauthorizedError,
 } from '../../shared/errors/AppError';
 import { TYPES } from '../../shared/constants/TYPES';
+import { AuthenticatedRequest } from '../types';
 
 @injectable()
 export class UserController {
-    private userUseCases: UserUseCases;
-
     constructor(
         @inject(TYPES.Logger) private logger: Logger,
-    ) {
-        this.userUseCases = container.get(UserUseCases);
-    }
+        @inject(UserUseCases)
+        private userUseCases: UserUseCases,
+    ) {}
 
     async login(
         req: Request,
@@ -64,7 +57,7 @@ export class UserController {
     }
 
     async createUser(
-        req: Request,
+        req: AuthenticatedRequest,
         res: Response,
     ): Promise<void> {
         try {

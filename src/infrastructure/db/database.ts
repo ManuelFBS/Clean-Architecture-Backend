@@ -7,7 +7,7 @@ export class Database {
     private static instance: Database;
     private connection: mysql.Pool;
 
-    private constructor() {
+    public constructor() {
         this.connection = mysql.createPool({
             host: process.env.DB_HOST,
             user: process.env.DB_USER,
