@@ -1,5 +1,7 @@
 import rateLimit from 'express-rate-limit';
-import logger from '../../shared/logger';
+import { Logger } from '../../shared/logger';
+
+const logger = new Logger();
 
 export const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, //> 15 minutes...

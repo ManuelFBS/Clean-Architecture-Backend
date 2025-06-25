@@ -1,7 +1,6 @@
 import { Router } from 'express';
+import { container } from '../../../shared/container';
 import { EmployeeController } from '../../controllers/Employee.Controller';
-// import { EmployeeRepositoryImpl } from '../../../infrastructure/repositories/EmployeeRepositoryImpl';
-// import { EmployeeUseCases } from '../../../core/usecases/employee/EmployeeUseCases';
 import {
     authenticate,
     authorize,
@@ -11,7 +10,9 @@ import { CreateEmployeeDTO } from '../../dtos/EmployeeDTO';
 
 const EmployeeRoutes = Router();
 
-const employeeController = new EmployeeController();
+const employeeController = container.get(
+    EmployeeController,
+);
 
 //~ Función wrapper para manejar promesas...
 const asyncHandler =

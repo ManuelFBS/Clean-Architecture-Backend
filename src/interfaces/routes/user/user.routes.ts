@@ -1,4 +1,5 @@
 import { Router } from 'express';
+import { container } from '../../../shared/container';
 import { UserController } from '../../controllers/User.Controller';
 import {
     CreateUserDTO,
@@ -16,7 +17,7 @@ import {
 } from '../../middlewares/rateLimiter';
 
 const UserRoutes = Router();
-const userController = new UserController();
+const userController = container.get(UserController);
 
 //~ Rutas públicas...
 UserRoutes.post(
