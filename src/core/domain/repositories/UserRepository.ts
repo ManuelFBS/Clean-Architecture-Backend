@@ -10,4 +10,23 @@ export interface UserRepository {
     ): Promise<User>;
     delete(dni: string): Promise<void>;
     countAdmins(): Promise<number>;
+    //* Métodos para logging de sesiones...
+    logUserLogin(
+        dni: string,
+        loginTime: Date,
+        ipAddress?: string,
+        userAgent?: string,
+    ): Promise<void>;
+    logUserLogout(
+        dni: string,
+        loginTime: Date,
+        ipAddress?: string,
+        userAgent?: string,
+    ): Promise<void>;
+    //* Método opcional para obtener sesiones activas...
+    getActiveSession(
+        dni: string,
+    ): Promise<
+        Array<{ loginTime: Date; ipAddress?: string }>
+    >;
 }
