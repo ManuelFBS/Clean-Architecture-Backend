@@ -35,14 +35,23 @@ export class UserController {
             const loginData = new LoginDTO();
             Object.assign(loginData, req.body);
 
+            //* Obtener información del cliente...
+            const ipAddress =
+                req.ip ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress;
+            const userAgent = req.get('User-Agent');
+
             const { token, user } =
                 await this.userUseCases.login(
                     loginData.username,
                     loginData.password,
+                    ipAddress,
+                    userAgent,
                 );
 
             this.logger.info(
-                `User logged in: ${user.username}`,
+                `User logged in: ${user.username} from IP: ${ipAddress}`,
             );
             res.status(200).json({ token, user });
         } catch (error: any) {
@@ -50,6 +59,55 @@ export class UserController {
                 `Login failed: ${error.message}`,
             );
             res.status(error.statusCode || 401).json({
+                status: 'error',
+                message: error.message,
+            });
+        }
+    }
+
+    async logout(
+        req: Request,
+        res: Response,
+    ): Promise<void> {
+        try {
+            // Obtener el token del header Authorization
+            const token = req
+                .header('Authorization')
+                ?.replace('Bearer ', '');
+
+            if (!token) {
+                throw new UnauthorizedError(
+                    'No token provided',
+                );
+            }
+
+            //* Obtener información del cliente...
+            const ipAddress =
+                req.ip ||
+                req.connection.remoteAddress ||
+                req.socket.remoteAddress;
+            const userAgent = req.get('User-Agent');
+
+            //* Ejecutar el logout...
+            await this.userUseCases.logout(
+                token,
+                ipAddress,
+                userAgent,
+            );
+
+            this.logger.info(
+                'User logged out successfully',
+            );
+
+            res.status(200).json({
+                status: 'success',
+                message: 'Logged out successfully',
+            });
+        } catch (error: any) {
+            this.logger.error(
+                `Logout failed: ${error.message}`,
+            );
+            res.status(error.statusCode || 400).json({
                 status: 'error',
                 message: error.message,
             });
