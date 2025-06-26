@@ -50,7 +50,7 @@ EmployeeRoutes.get(
 );
 
 EmployeeRoutes.post(
-    '/newemployee',
+    '/newemp',
     authenticate,
     asyncHandler(authorize(['employee:create'])),
     validationMiddleware(CreateEmployeeDTO),
