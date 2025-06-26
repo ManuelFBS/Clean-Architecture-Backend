@@ -5,7 +5,7 @@ import cors from 'cors';
 import { TYPES } from '../../shared/constants/TYPES';
 import { Database } from '../db/database';
 import dotenv from 'dotenv';
-import { ErrorMiddleware } from '../../interfaces/middlewares/errorMiddleware';
+import ErrorMiddleware from '../../interfaces/middlewares/errorMiddleware';
 import { Logger } from '../../shared/logger';
 
 dotenv.config();
@@ -22,8 +22,6 @@ export class Server {
         this.app = express();
         this.port = process.env.PORT || 4500;
         this.configureMiddleware();
-        this.configureErrorHandling();
-        // La base de datos se inicializará en el método start()
     }
 
     //~ Función wrapper para manejar promesas...
@@ -58,15 +56,6 @@ export class Server {
     public configureRoutes(): void {
         // Las rutas se configurarán después de que el contenedor esté inicializado
         // Esto se hará desde el index.ts
-    }
-
-    public getApp(): express.Application {
-        return this.app;
-    }
-
-    private configureErrorHandling(): void {
-        this.app.use(this.asyncHandler(ErrorMiddleware));
-        this.logger.info('Error handling configured');
 
         //> Ruta de prueba para verificar el funcionamiento del Servidor...
         this.app.get('/test', (req, res) => {
@@ -74,9 +63,17 @@ export class Server {
         });
     }
 
+    public getApp(): express.Application {
+        return this.app;
+    }
+
     public async start(): Promise<void> {
         // Inicializar la base de datos antes de iniciar el servidor
         await this.initializeDatabase();
+
+        // Configurar el middleware de errores AL FINAL, después de todas las rutas
+        this.app.use(ErrorMiddleware);
+        this.logger.info('Error handling configured');
 
         this.app.listen(this.port, () => {
             this.logger.info(

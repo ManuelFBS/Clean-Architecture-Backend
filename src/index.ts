@@ -9,6 +9,9 @@ console.log('🟢 INICIANDO SERVIDOR');
 //~ Resuelve las dependencias del servidor...
 const server = container.get<Server>(Server);
 
+//~ Configura las rutas del servidor (incluyendo /test)...
+server.configureRoutes();
+
 //~ Configura las rutas después de que el contenedor esté inicializado...
 const app = server.getApp();
 app.use('/api/employees', EmployeeRoutes);
