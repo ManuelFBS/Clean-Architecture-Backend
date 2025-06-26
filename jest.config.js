@@ -1,10 +1,12 @@
-export const preset = 'ts-jest';
-export const testEnvironment = 'node';
-export const roots = ['<rootDir>/src', '<rootDir>/tests'];
-export const moduleFileExtensions = ['ts', 'js', 'json'];
-export const testMatch = ['**/?(*.)+(spec|test).ts'];
-export const globals = {
-    'ts-jest': {
-        tsconfig: 'tsconfig.json',
+module.exports = {
+    preset: 'ts-jest',
+    testEnvironment: 'node',
+    roots: ['<rootDir>/src', '<rootDir>/tests'],
+    moduleFileExtensions: ['ts', 'js', 'json'],
+    testMatch: ['**/?(*.)+(spec|test).ts'],
+    globals: {
+        'ts-jest': {
+            tsconfig: 'tsconfig.json',
+        },
     },
 };
