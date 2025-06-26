@@ -5,6 +5,7 @@ import {
 } from '../../domain/entities/User';
 import { UserRepository } from '../../domain/repositories/UserRepository';
 import { EmployeeRepository } from '../../domain/repositories/EmployeeRepository';
+import { TokenService } from '../../domain/services/TokenService';
 import { EmailService } from '../../domain/services/EmailService';
 import {
     BadRequestError,
@@ -28,11 +29,15 @@ export class UserUseCases {
         private emailService: EmailService,
         @inject(TYPES.EmployeeRepository)
         private employeeRepository: EmployeeRepository,
+        @inject(TYPES.TokenService)
+        private tokenService: TokenService,
     ) {}
 
     async login(
         username: string,
         password: string,
+        ipAddress?: string,
+        userAgent?: string,
     ): Promise<{ token: string; user: User }> {
         const user =
             await this.userRepository.findByUsername(
@@ -61,6 +66,14 @@ export class UserUseCases {
             throw new ForbiddenError('Email not verified');
         }
 
+        //* Se registra el login exitoso...
+        await this.userRepository.logUserLogin(
+            user.dni,
+            new Date(),
+            ipAddress,
+            userAgent,
+        );
+
         const token = jwt.sign(
             {
                 dni: user.dni,
@@ -75,6 +88,48 @@ export class UserUseCases {
         );
 
         return { token, user };
+    }
+
+    async logout(
+        token: string,
+        ipAddress?: string,
+        userAgent?: string,
+    ): Promise<void> {
+        try {
+            //* Decodificar el token para obtener información del usuario...
+            const jwt = require('jsonwebtoken');
+            const decoded = jwt.decode(token) as {
+                dni: string;
+                username: string;
+                role: string;
+                exp: number;
+            };
+
+            if (!decoded || !decoded.dni) {
+                throw new UnauthorizedError(
+                    'Invalid token',
+                );
+            }
+
+            //* Invalidar el token (agregarlo a la blacklist)...
+            await this.tokenService.invalidateToken(token);
+
+            //* Registrar el logout en el repositorio...
+            await this.userRepository.logUserLogout(
+                decoded.dni,
+                new Date(),
+                ipAddress,
+                userAgent,
+            );
+
+            //* Log del evento...
+            console.log(
+                `User logged out: ${decoded.username}`,
+            );
+        } catch (error) {
+            console.error('Error during logout:', error);
+            throw error;
+        }
     }
 
     async createUser(

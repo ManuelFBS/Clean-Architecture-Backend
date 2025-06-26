@@ -11,6 +11,7 @@ export const TYPES = {
     UserRepository: Symbol.for('UserRepository'),
     UserController: Symbol.for('UserController'),
     UserRoutes: Symbol.for('UserRoutes'),
+    TokenService: Symbol.for('TokenService'),
     EmailService: Symbol.for('EmailService'),
     ErrorMiddleware: Symbol.for('ErrorMiddleware'),
 };
