@@ -114,6 +114,57 @@ export class UserController {
         }
     }
 
+    async checkAuth(
+        req: Request,
+        res: Response,
+    ): Promise<void> {
+        try {
+            const token = req
+                .header('Authorization')
+                ?.replace('Bearer ', '');
+
+            if (!token) {
+                throw new UnauthorizedError(
+                    'No token provided',
+                );
+            }
+
+            const isValid =
+                await this.userUseCases.validateToken(
+                    token,
+                );
+
+            if (!isValid) {
+                throw new UnauthorizedError(
+                    'Invalid or expired token',
+                );
+            }
+
+            //* Decodificar el token para obtener información del usuario...
+            const jwt = require('jsonwebtoken');
+            const decoded = jwt.decode(token);
+
+            res.status(200).json({
+                status: 'success',
+                authenticated: true,
+                user: {
+                    dni: decoded.dni,
+                    username: decoded.username,
+                    role: decoded.role,
+                },
+            });
+        } catch (error: any) {
+            this.logger.error(
+                `Auth check failed: ${error.message}`,
+            );
+            res.status(error.statusCode || 401).json({
+                status: 'error',
+                authenticated: false,
+                message: error.message,
+            });
+        }
+    }
+
     async createUser(
         req: AuthenticatedRequest,
         res: Response,

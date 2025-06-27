@@ -4,16 +4,18 @@ import { Database } from '../infrastructure/db/database';
 import { EmployeeUseCases } from '../core/usecases/employee/EmployeeUseCases';
 import { EmployeeRepository } from '../core/domain/repositories/EmployeeRepository';
 import { EmployeeRepositoryImpl } from '../infrastructure/repositories/EmployeeRepositoryImpl';
+import { EmployeeController } from '../interfaces/controllers/Employee.Controller';
 import { UserUseCases } from '../core/usecases/user/UserUseCases';
 import { UserRepository } from '../core/domain/repositories/UserRepository';
 import { UserRepositoryImpl } from '../infrastructure/repositories/UserRepositoryImpl';
 import { UserController } from '../interfaces/controllers/User.Controller';
 import { EmailService } from '../core/domain/services/EmailService';
 import { EmailServiceImpl } from '../infrastructure/services/EmailServiceImpl';
+import { TokenService } from '../core/domain/services/TokenService';
+import { TokenServiceImpl } from '../infrastructure/services/TokenServiceImpl';
 import { Server } from '../infrastructure/web/server';
 import { Logger } from '../shared/logger';
 import { TYPES } from './constants/TYPES';
-import { EmployeeController } from '../interfaces/controllers/Employee.Controller';
 
 const container = new Container();
 
@@ -39,6 +41,12 @@ container
 container
     .bind<EmailService>(TYPES.EmailService)
     .to(EmailServiceImpl)
+    .inSingletonScope();
+
+//* Nuevo servicio de tokens...
+container
+    .bind<TokenService>(TYPES.TokenService)
+    .to(TokenServiceImpl)
     .inSingletonScope();
 
 //* Casos de uso...

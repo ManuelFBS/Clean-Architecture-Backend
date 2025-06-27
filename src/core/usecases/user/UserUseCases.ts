@@ -132,6 +132,31 @@ export class UserUseCases {
         }
     }
 
+    //* Método para verificar si un token es válido...
+    async validateToken(token: string): Promise<boolean> {
+        try {
+            //* Verificar si el token está en la blacklist...
+            const isInvalid =
+                await this.tokenService.isTokenInvalid(
+                    token,
+                );
+            if (isInvalid) {
+                return false;
+            }
+
+            //* Verificar que el token sea válido con JWT...
+            const jwt = require('jsonwebtoken');
+            jwt.verify(
+                token,
+                process.env.JWT_SECRET || 'default_secret',
+            );
+
+            return true;
+        } catch (error) {
+            return false;
+        }
+    }
+
     async createUser(
         userData: UserCreateParams,
     ): Promise<User> {
@@ -190,7 +215,7 @@ export class UserUseCases {
             throw new NotFoundError('User not found');
         }
 
-        //* Validar username único si se está cambiando
+        //* Validar username único si se está cambiando...
         if (
             userData.username &&
             userData.username !== existingUser.username
@@ -206,7 +231,7 @@ export class UserUseCases {
             }
         }
 
-        // Validar que no se cambie el rol a Owner si ya existe uno
+        //* Validar que no se cambie el rol a Owner si ya existe uno...
         if (userData.role === 'Owner') {
             const adminCount =
                 await this.userRepository.countAdmins();

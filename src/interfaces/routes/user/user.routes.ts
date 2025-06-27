@@ -30,6 +30,19 @@ UserRoutes.post(
     userController.login.bind(userController),
 );
 
+UserRoutes.post(
+    '/logout',
+    authenticate,
+    userController.logout.bind(userController),
+);
+
+//~ Nueva ruta para verificar autenticación
+UserRoutes.get(
+    '/auth/check',
+    authenticate,
+    userController.checkAuth.bind(userController),
+);
+
 //~ Rutas autenticadas...
 UserRoutes.post(
     '/newuser',

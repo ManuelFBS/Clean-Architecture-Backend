@@ -19,12 +19,12 @@ export interface UserRepository {
     ): Promise<void>;
     logUserLogout(
         dni: string,
-        loginTime: Date,
+        logoutTime: Date,
         ipAddress?: string,
         userAgent?: string,
     ): Promise<void>;
     //* Método opcional para obtener sesiones activas...
-    getActiveSession(
+    getActiveSessions(
         dni: string,
     ): Promise<
         Array<{ loginTime: Date; ipAddress?: string }>
