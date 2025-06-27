@@ -43,6 +43,9 @@ export class UserUseCases {
             await this.userRepository.findByUsername(
                 username,
             );
+
+        console.log('Usuario encontrado:', user);
+
         if (!user) {
             throw new UnauthorizedError(
                 'Invalid credentials',
@@ -51,6 +54,9 @@ export class UserUseCases {
 
         const isValidPassword =
             await user.validatePassword(password);
+
+        console.log('¿Contraseña válida?', isValidPassword);
+
         if (!isValidPassword) {
             throw new UnauthorizedError(
                 'Invalid credentials',
@@ -202,7 +208,8 @@ export class UserUseCases {
             }
         }
 
-        return User.create(userData);
+        const user = await User.create(userData);
+        return this.userRepository.create(user);
     }
 
     async updateUser(

@@ -6,6 +6,17 @@ import { UserRepository } from '../../core/domain/repositories/UserRepository';
 import { Database } from '../db/database';
 import bcrypt from 'bcrypt';
 
+function mapRowToUser(row: any): User {
+    return new User(
+        row.dni,
+        row.username,
+        row.password,
+        row.role,
+        row.createdAt ? new Date(row.createdAt) : undefined,
+        row.updatedAt ? new Date(row.updatedAt) : undefined,
+        undefined, //> Aquí se podría mapear el empleado si se necesita..
+    );
+}
 export class UserRepositoryImpl implements UserRepository {
     private db: Database;
 
@@ -21,8 +32,10 @@ export class UserRepositoryImpl implements UserRepository {
             'SELECT * FROM users WHERE username = ?',
             [username],
         );
-        const result = rows as User[];
-        return result.length ? result[0] : null;
+        const result = rows as any[];
+        return result.length
+            ? mapRowToUser(result[0])
+            : null;
     }
 
     async findByDNI(dni: string): Promise<User | null> {
@@ -31,8 +44,10 @@ export class UserRepositoryImpl implements UserRepository {
             'SELECT * FROM users WHERE dni = ?',
             [dni],
         );
-        const result = rows as User[];
-        return result.length ? result[0] : null;
+        const result = rows as any[];
+        return result.length
+            ? mapRowToUser(result[0])
+            : null;
     }
 
     async create(user: User): Promise<User> {
@@ -41,6 +56,7 @@ export class UserRepositoryImpl implements UserRepository {
             user.password,
             10,
         );
+
         await connection.query(
             'INSERT INTO users (dni, username, password, role) VALUES (?, ?, ?, ?)',
             [

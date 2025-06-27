@@ -32,14 +32,10 @@ export class User {
     public static async create(
         userData: Omit<IUser, 'createdAt' | 'updatedAt'>,
     ): Promise<User> {
-        const hashedPassword = await bcrypt.hash(
-            userData.password,
-            10,
-        );
         return new User(
             userData.dni,
             userData.username,
-            hashedPassword,
+            userData.password,
             userData.role,
             new Date(),
             new Date(),
