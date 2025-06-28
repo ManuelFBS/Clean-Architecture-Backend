@@ -20,6 +20,19 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+//* Interfaz para la respuesta segura del login (sin password)
+interface LoginResponse {
+    token: string;
+    user: {
+        dni: string;
+        username: string;
+        role: string;
+        createdAt: Date;
+        updatedAt: Date;
+        employee?: any;
+    };
+}
+
 @injectable()
 export class UserUseCases {
     constructor(
@@ -38,7 +51,7 @@ export class UserUseCases {
         password: string,
         ipAddress?: string,
         userAgent?: string,
-    ): Promise<{ token: string; user: User }> {
+    ): Promise<LoginResponse> {
         const user =
             await this.userRepository.findByUsername(
                 username,
@@ -93,7 +106,19 @@ export class UserUseCases {
             } as SignOptions,
         );
 
-        return { token, user };
+        //* Crear un objeto usuario sin el password para la respuesta
+        const { password: _, ...userWithoutPassword } =
+            user;
+
+        return {
+            token,
+            user: {
+                ...userWithoutPassword,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+                employee: employee,
+            },
+        };
     }
 
     async logout(

@@ -9,6 +9,7 @@ import {
     CreateUserDTO,
     UpdateUserDTO,
     LoginDTO,
+    LoginResponseDTO,
 } from '../dtos/UserDTO';
 import { Logger } from '../../shared/logger';
 import {
@@ -53,7 +54,21 @@ export class UserController {
             this.logger.info(
                 `User logged in: ${user.username} from IP: ${ipAddress}`,
             );
-            res.status(200).json({ token, user });
+
+            //* Devolver solo la información segura del usuario (sin password)
+            const loginResponse = new LoginResponseDTO({
+                dni: user.dni,
+                username: user.username,
+                role: user.role,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt,
+                employee: user.employee,
+            });
+
+            res.status(200).json({
+                token,
+                user: loginResponse,
+            });
         } catch (error: any) {
             this.logger.error(
                 `Login failed: ${error.message}`,

@@ -77,3 +77,29 @@ export class LoginDTO {
     @Length(8, 100)
     password: string;
 }
+
+//* DTO para la respuesta segura del login (sin password)
+export class LoginResponseDTO {
+    dni: string;
+    username: string;
+    role: string;
+    createdAt: Date;
+    updatedAt: Date;
+    employee?: any;
+
+    constructor(data: {
+        dni: string;
+        username: string;
+        role: string;
+        createdAt: Date;
+        updatedAt: Date;
+        employee?: any;
+    }) {
+        this.dni = data.dni;
+        this.username = data.username;
+        this.role = data.role;
+        this.createdAt = data.createdAt;
+        this.updatedAt = data.updatedAt;
+        this.employee = data.employee;
+    }
+}
