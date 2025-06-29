@@ -71,6 +71,13 @@ UserRoutes.delete(
 );
 
 UserRoutes.get(
+    '/allusers',
+    authenticate,
+    authorize(['user:create']),
+    userController.getAllUsers.bind(userController),
+);
+
+UserRoutes.get(
     '/:dni',
     authenticate,
     authorize(['user:create']),

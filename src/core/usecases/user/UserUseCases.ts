@@ -296,6 +296,10 @@ export class UserUseCases {
         return this.userRepository.delete(dni);
     }
 
+    async getAllUsers(): Promise<User[]> {
+        return this.userRepository.findAll();
+    }
+
     async getUserByDNI(dni: string): Promise<User | null> {
         return this.userRepository.findByDNI(dni);
     }

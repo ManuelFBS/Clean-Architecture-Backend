@@ -318,4 +318,30 @@ export class UserController {
             });
         }
     }
+
+    async getAllUsers(
+        req: Request,
+        res: Response,
+    ): Promise<void> {
+        try {
+            const users =
+                await this.userUseCases.getAllUsers();
+
+            const allUsers = {
+                users: users.map((user) => ({
+                    dni: user.dni,
+                    username: user.username,
+                    role: user.role,
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt,
+                })),
+            };
+
+            res.status(200).json(allUsers);
+        } catch (error: any) {
+            res.status(500).json({
+                message: error.message,
+            });
+        }
+    }
 }

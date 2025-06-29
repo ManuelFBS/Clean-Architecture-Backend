@@ -1,6 +1,7 @@
 import { User, UserCreateParams } from '../entities/User';
 
 export interface UserRepository {
+    findAll(): Promise<User[]>;
     findByUsername(username: string): Promise<User | null>;
     findByDNI(dni: string): Promise<User | null>;
     create(user: UserCreateParams): Promise<User>;

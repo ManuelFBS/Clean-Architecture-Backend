@@ -24,6 +24,15 @@ export class UserRepositoryImpl implements UserRepository {
         this.db = Database.getInstance();
     }
 
+    async findAll(): Promise<User[]> {
+        const connection = await this.db.getConnection();
+        const [rows] = await connection.query(
+            'SELECT * FROM users',
+        );
+
+        return rows as User[];
+    }
+
     async findByUsername(
         username: string,
     ): Promise<User | null> {
